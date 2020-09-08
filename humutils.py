@@ -2,8 +2,6 @@ import wave
 
 import numpy as np
 from pyaudio import PyAudio, paInt16
-from pydub import AudioSegment
-from pydub.playback import play
 
 
 def record_audio(outfile_name=None, record_seconds=1, chunk=1024, channels=1, rate=22050):
@@ -50,3 +48,28 @@ def record_audio(outfile_name=None, record_seconds=1, chunk=1024, channels=1, ra
 
     frames_for_np = np.array(frames_for_np).flatten()
     return frames_for_np / np.max(frames_for_np)
+
+
+def create_pure_tone_numpy(freq, duration, sr):
+    """Generate a pure tone at <freq> Hz and <duration> seconds at <sr> Sampling Rate
+    """
+    t = np.linspace(0, duration, int(duration * sr), endpoint=False)  # time grid
+    y = 1.0 * np.sin(2 * np.pi * freq * t)  # pure sine wave at <freq> Hz
+    return y.astype('float32')
+
+
+note2freq = {
+    "A2": 110.00,
+    "A#2": 116.54,
+    "B2": 123.47,
+    "C3": 130.81,
+    "C#3": 138.59,
+    "D3": 146.83,
+    "D#3": 155.56,
+    "E3": 164.81,
+    "F3": 174.61,
+    "F#3": 185.00,
+    "G3": 196.00,
+    "G#3": 207.65,
+    "A3": 220.00,
+}
