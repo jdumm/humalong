@@ -4,13 +4,11 @@ import time
 import librosa
 import librosa.display
 import matplotlib.pyplot as plt
-
 import numpy as np
 from pydub import AudioSegment
 from pydub.playback import play
 
-import humutils
-import importlib; importlib.reload(humutils)
+from humutils import record_audio
 
 
 def main():
@@ -22,7 +20,7 @@ def main():
     duration = 1.0  # seconds
     t = np.linspace(0, duration, int(duration * sr), endpoint=False)  # time grid
     y = 1.0 * np.sin(2 * np.pi * freq * t)  # pure sine wave at <freq> Hz
-    y = y.astype('float32') # downscale from float64 to enable playback with pydub
+    y = y.astype('float32')  # downscale from float64 to enable playback with pydub
     y_audio_seg = AudioSegment(y.tobytes(), frame_rate=sr, sample_width=y.dtype.itemsize, channels=1)
 
     # Play the pure tone
@@ -35,14 +33,14 @@ def main():
         input("Press enter to record your purest tone!")
         time.sleep(0.1)
         outfile_name = 'temp_user_recording.wav'
-        x = humutils.record_audio(outfile_name=outfile_name, record_seconds=1, chunk=1024, channels=1, rate=sr)
+        x = record_audio(outfile_name=outfile_name, record_seconds=1, chunk=1024, channels=1, rate=sr)
     else:
         audio_path = "default_user_recording.wav"
         x, _ = librosa.load(audio_path, sr=sr)
-        x = x/x.max()
+        x = x / x.max()
     x = x[0:len(y)]  # trim to be the same length as the pure tone
 
-    # Calculate constant-q transform for y (target) and x (user recording) and display them
+    # Calculate constant-q transform for y (target) and x (user recording)
     cqt_y = np.abs(librosa.cqt(y, sr=sr))
     cqt_x = np.abs(librosa.cqt(x, sr=sr))
 
@@ -52,14 +50,15 @@ def main():
 
     print(f"Your Pure Tone Score is {score / baseline_score * 100:0.1f}!")
 
-    wait_for_next_action(x, y, sr)
+    menu(x, y, sr)
 
 
-def wait_for_next_action(x, y, sr):
+def menu(x, y, sr):
     """ Wait for user input to decide what to do next.
     """
-    response = input("r) retry\nq) quit\ny) listen again to the pure tone\nx) listen to your recording\nb) listen to the "
-              "beat frequency\ng) see graphics\n")
+    response = input(
+        "r) retry\nq) quit\ny) listen again to the pure tone\nx) listen to your recording\nb) listen to the "
+        "beat frequency\ng) see graphics\n")
     if response == 'r':
         print('-- Reloading')
         main()
@@ -128,11 +127,11 @@ def wait_for_next_action(x, y, sr):
         # fig.colorbar(img_x, ax=ax, format="%+2.0f dB")
 
         print(' * Close the graphs to proceed')
-        #plt.show(block=True)
+        # plt.show(block=True)
         plt.show()
     else:
-        print('--Input not understood')
-    wait_for_next_action(x, y, sr)
+        print('-- Input not understood')
+    menu(x, y, sr)
 
 
 if __name__ == '__main__':
