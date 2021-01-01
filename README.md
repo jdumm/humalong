@@ -1,3 +1,7 @@
+### Nota Bene
+
+This repository has been deprecated and rebranded as <a href=https://github.com/jdumm/simon-sings>simon-sings</a>.
+
 ### Overview
 
 A quick game to see how good you can match and maintain musical pitch while humming!
